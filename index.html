@@ -74,12 +74,15 @@
     </footer>
 
     <script>
-        const BACKEND_URL = "http://localhost:8000";
+        // ⚠️ REMPLACE CETTE URL PAR TON LIEN NGROK ACTIF (Ex: https://1a2b-34-56.ngrok-free.app)
+        const BACKEND_URL = "https://TON_LIEN_NGROK.ngrok-free.app"; 
         let currentUserEmail = null;
 
         // 1. Gestion de l'authentification et redirection
         function loginGoogle() {
-            window.location.href = `${BACKEND_URL}/login`;
+            // Ajout du paramètre d'origine pour que le serveur sache d'où vient la demande
+            const currentOrigin = window.location.origin + window.location.pathname;
+            window.location.href = `${BACKEND_URL}/login?origin=${encodeURIComponent(currentOrigin)}`;
         }
 
         // Analyser l'URL pour détecter le retour de connexion Google (?user=...)
@@ -90,7 +93,7 @@
             if (user) {
                 currentUserEmail = user;
                 localStorage.setItem('ria_user_email', user);
-                // Nettoyer l'URL
+                // Nettoyer l'URL proprement sur le smartphone
                 window.history.replaceState({}, document.title, window.location.pathname);
                 initDashboardUI();
             } else {
@@ -150,7 +153,7 @@
 
             // Widget 1 : Agenda Google
             let agendaHtml = `
-                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
+                <div id="widget-agenda" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-sm tracking-wide uppercase text-slate-400">Prochains rendez-vous</h3>
                         <span class="bg-indigo-500/10 text-indigo-400 text-xs px-2.5 py-1 rounded-full font-medium">Agenda</span>
@@ -175,7 +178,7 @@
 
             // Widget 2 : Notifications Gmail
             let gmailHtml = `
-                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
+                <div id="widget-gmail" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-sm tracking-wide uppercase text-slate-400">Messagerie urgente</h3>
                         <span class="bg-amber-500/10 text-amber-400 text-xs px-2.5 py-1 rounded-full font-medium">Gmail</span>
@@ -191,7 +194,7 @@
             grid.innerHTML = agendaHtml + gmailHtml;
         }
 
-        // 4. Soumission du prompt à Ria
+        // 4. Soumission du prompt à Ria & Génération de widget à la volée
         document.getElementById('prompt-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('user-input');
@@ -201,8 +204,42 @@
             console.log(`Requête transmise à Ria (${currentUserEmail}) :`, query);
             input.value = '';
 
-            // TODO : Connecter le LLM au Backend pour qu'il prenne en entrée la commande (query),
-            // exécute les outils Google si nécessaire, et retourne du code HTML épuré à injecter ici.
+            // Simulation d'une création de document Google Doc via l'API quand l'utilisateur tape une demande de note/doc
+            if (query.toLowerCase().includes('document') || query.toLowerCase().includes('note')) {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/create-doc`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user: currentUserEmail,
+                            title: "Note de travail - Ria Agent",
+                            content: `Document généré automatiquement à la demande de l'utilisateur via le prompt : "${query}"`
+                        })
+                    });
+
+                    if (response.ok) {
+                        const docData = await response.json();
+                        
+                        // Injection dynamique d'un NOUVEAU widget pour le document créé sur la page blanche !
+                        const grid = document.getElementById('dashboard-grid');
+                        const docWidgetHtml = `
+                            <div class="bg-slate-900/80 border border-emerald-800/50 rounded-2xl p-5 shadow-xl backdrop-blur-sm animate-fade-in">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-semibold text-sm tracking-wide uppercase text-emerald-400">Document Créé</h3>
+                                    <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium">Drive</span>
+                                </div>
+                                <p class="text-sm text-slate-300 mb-4">Le document à propos de votre demande a été ajouté à votre cloud.</p>
+                                <a href="${docData.url}" target="_blank" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-emerald-600/10">
+                                    Ouvrir dans Google Docs
+                                </a>
+                            </div>
+                        `;
+                        grid.insertAdjacentHTML('beforeend', docWidgetHtml);
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la création du document :", error);
+                }
+            }
         });
 
         // Lancement de la vérification de session au chargement
