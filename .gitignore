@@ -1,0 +1,7 @@
+# Ignorer les clés privées Google
+client_secret.json
+
+# Ignorer l'environnement virtuel Python
+venv/
+.venv/
+__pycache__/
