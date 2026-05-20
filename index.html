@@ -6,244 +6,46 @@
     <title>Ria - Dashboard Personnel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background-color: #0b0f19;
-            color: #f1f5f9;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        /* Masquer la scrollbar proprement */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Style minimal pour le fond et la structure */
+        body { background-color: #0f172a; color: #f8fafc; }
     </style>
 </head>
-<body class="h-screen flex flex-col justify-between p-4 md:p-6">
+<body class="h-screen flex flex-col justify-between p-6">
 
-    <!-- ENTÊTE DE LA PAGE -->
-    <header class="flex justify-between items-center w-full max-w-6xl mx-auto mb-6">
-        <div class="flex items-center gap-3">
-            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-600/30">R</div>
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">Ria</h1>
-                <p class="text-xs text-slate-400" id="connection-status">Hors ligne</p>
-            </div>
-        </div>
-        <div id="auth-zone">
-            <!-- Remplacé dynamiquement par le bouton de connexion ou le profil -->
-            <button onclick="loginGoogle()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-md">
-                Connexion Google
-            </button>
-        </div>
-    </header>
-
-    <!-- CONTAINER PRINCIPAL (DASHBOARD GÉNÉRÉ) -->
-    <main class="flex-grow w-full max-w-6xl mx-auto overflow-y-auto no-scrollbar mb-6">
-        <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-            
-            <!-- Écran d'accueil par défaut -->
-            <div id="welcome-card" class="col-span-full bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center backdrop-blur-sm py-16 my-auto">
-                <h2 class="text-2xl font-semibold mb-2">Votre page blanche personnelle</h2>
-                <p class="text-slate-400 max-w-md mx-auto mb-6 text-sm">
-                    Connectez votre compte Google, puis demandez à Ria de concevoir vos widgets (météo, emails, calendrier, documents...) sur-mesure.
-                </p>
-                <button onclick="loginGoogle()" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all border border-slate-700">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.13-4.53z"/>
-                    </svg>
-                    Associer Google
-                </button>
-            </div>
-
+    <!-- ZONE DE DASHBOARD (Conteneur dynamique) -->
+    <main id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full flex-grow items-start overflow-y-auto mb-6">
+        <!-- Les composants/widgets de Ria viendront s'injecter ici -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl col-span-full text-center py-12">
+            <h2 class="text-xl text-slate-400">Que puis-je préparer pour votre dashboard aujourd'hui ?</h2>
         </div>
     </main>
 
-    <!-- BARRE DE COMMANDE / PROMPT -->
+    <!-- ZONE DU PROMPT (Barre de commande) -->
     <footer class="w-full max-w-4xl mx-auto">
-        <form id="prompt-form" class="relative flex items-center mb-2">
+        <form id="prompt-form" class="relative flex items-center">
             <input type="text" id="user-input" 
-                   class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl pl-6 pr-24 py-4 text-base focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xl transition-all placeholder:text-slate-500 backdrop-blur-md"
-                   placeholder="Ex: Résume mon calendrier de l'après-midi et montre mes mails urgents..." autocomplete="off" disabled>
-            <button type="submit" id="submit-btn"
-                    class="absolute right-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white p-2 px-5 rounded-xl transition-all font-medium text-sm shadow-lg shadow-indigo-600/20" disabled>
+                   class="w-full bg-slate-800 border border-slate-700 rounded-2xl pl-6 pr-16 py-4 text-lg focus:outline-none focus:border-indigo-500 shadow-2xl transition-all"
+                   placeholder="Ex: Prépare un widget météo et ma timeline du jour..." autocomplete="off">
+            <button type="submit" 
+                    class="absolute right-4 bg-indigo-600 hover:bg-indigo-500 text-white p-2 px-4 rounded-xl transition-colors font-medium">
                 Ria
             </button>
         </form>
-        <p class="text-center text-[10px] text-slate-500">Ria - Agent Personnel connecté à votre écosystème cloud.</p>
     </footer>
 
     <script>
-        // ⚠️ REMPLACE CETTE URL PAR TON LIEN NGROK ACTIF (Ex: https://1a2b-34-56.ngrok-free.app)
-        const BACKEND_URL = "https://TON_LIEN_NGROK.ngrok-free.app"; 
-        let currentUserEmail = null;
-
-        // 1. Gestion de l'authentification et redirection
-        function loginGoogle() {
-            // Ajout du paramètre d'origine pour que le serveur sache d'où vient la demande
-            const currentOrigin = window.location.origin + window.location.pathname;
-            window.location.href = `${BACKEND_URL}/login?origin=${encodeURIComponent(currentOrigin)}`;
-        }
-
-        // Analyser l'URL pour détecter le retour de connexion Google (?user=...)
-        function checkAuthStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-
-            if (user) {
-                currentUserEmail = user;
-                localStorage.setItem('ria_user_email', user);
-                // Nettoyer l'URL proprement sur le smartphone
-                window.history.replaceState({}, document.title, window.location.pathname);
-                initDashboardUI();
-            } else {
-                const storedUser = localStorage.getItem('ria_user_email');
-                if (storedUser) {
-                    currentUserEmail = storedUser;
-                    initDashboardUI();
-                }
-            }
-        }
-
-        // 2. Initialisation de l'interface quand l'utilisateur est connecté
-        async function initDashboardUI() {
-            if (!currentUserEmail) return;
-
-            // Mise à jour de l'état graphique de l'entête
-            document.getElementById('connection-status').innerText = `Connecté : ${currentUserEmail}`;
-            document.getElementById('connection-status').classList.remove('text-slate-400');
-            document.getElementById('connection-status').classList.add('text-emerald-400');
-            
-            document.getElementById('auth-zone').innerHTML = `
-                <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
-                    <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-medium text-slate-300">${currentUserEmail.split('@')[0]}</span>
-                    <button onclick="logout()" class="text-slate-500 hover:text-rose-400 ml-2 text-xs transition-colors">Déconnexion</button>
-                </div>
-            `;
-
-            // Activer la barre de saisie du prompt
-            document.getElementById('user-input').removeAttribute('disabled');
-            document.getElementById('user-input').placeholder = "Demandez à Ria de structurer votre espace...";
-            document.getElementById('submit-btn').removeAttribute('disabled');
-
-            // Appel au backend pour récupérer les données initiales Google de test
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/init-dashboard?user=${encodeURIComponent(currentUserEmail)}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    renderInitialWidgets(data);
-                } else if (response.status === 401) {
-                    logout();
-                }
-            } catch (error) {
-                console.error("Erreur de communication avec Ria Backend :", error);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('ria_user_email');
-            window.location.href = window.location.pathname; // Recharge la page à blanc
-        }
-
-        // 3. Affichage dynamique des premières données brutes reçues (Simulation de widget UI)
-        function renderInitialWidgets(data) {
-            const grid = document.getElementById('dashboard-grid');
-            grid.innerHTML = ''; // Vider l'écran d'accueil par défaut
-
-            // Widget 1 : Agenda Google
-            let agendaHtml = `
-                <div id="widget-agenda" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-sm tracking-wide uppercase text-slate-400">Prochains rendez-vous</h3>
-                        <span class="bg-indigo-500/10 text-indigo-400 text-xs px-2.5 py-1 rounded-full font-medium">Agenda</span>
-                    </div>
-                    <div class="space-y-3">
-            `;
-            
-            if (data.agenda && data.agenda.length > 0) {
-                data.agenda.forEach(event => {
-                    const eventDate = new Date(event.start).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-                    agendaHtml += `
-                        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800/60 hover:border-slate-700/60 transition-all">
-                            <p class="text-sm font-medium text-slate-200">${event.title || 'Sans titre'}</p>
-                            <p class="text-xs text-indigo-400 mt-1">${eventDate}</p>
-                        </div>
-                    `;
-                });
-            } else {
-                agendaHtml += `<p class="text-xs text-slate-500 text-center py-4">Aucun événement à venir.</p>`;
-            }
-            agendaHtml += `</div></div>`;
-
-            // Widget 2 : Notifications Gmail
-            let gmailHtml = `
-                <div id="widget-gmail" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-sm tracking-wide uppercase text-slate-400">Messagerie urgente</h3>
-                        <span class="bg-amber-500/10 text-amber-400 text-xs px-2.5 py-1 rounded-full font-medium">Gmail</span>
-                    </div>
-                    <div class="text-center py-6">
-                        <span class="text-4xl font-bold text-slate-100">${data.mails_count || 0}</span>
-                        <p class="text-xs text-slate-400 mt-2">Emails non lus détectés par Ria</p>
-                    </div>
-                </div>
-            `;
-
-            // Injection des cartes
-            grid.innerHTML = agendaHtml + gmailHtml;
-        }
-
-        // 4. Soumission du prompt à Ria & Génération de widget à la volée
+        // Logique de capture du prompt (on branchera l'API ici)
         document.getElementById('prompt-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('user-input');
             const query = input.value.trim();
-            if (!query || !currentUserEmail) return;
+            if (!query) return;
 
-            console.log(`Requête transmise à Ria (${currentUserEmail}) :`, query);
+            console.log("Envoi à Ria :", query);
             input.value = '';
-
-            // Simulation d'une création de document Google Doc via l'API quand l'utilisateur tape une demande de note/doc
-            if (query.toLowerCase().includes('document') || query.toLowerCase().includes('note')) {
-                try {
-                    const response = await fetch(`${BACKEND_URL}/api/create-doc`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            user: currentUserEmail,
-                            title: "Note de travail - Ria Agent",
-                            content: `Document généré automatiquement à la demande de l'utilisateur via le prompt : "${query}"`
-                        })
-                    });
-
-                    if (response.ok) {
-                        const docData = await response.json();
-                        
-                        // Injection dynamique d'un NOUVEAU widget pour le document créé sur la page blanche !
-                        const grid = document.getElementById('dashboard-grid');
-                        const docWidgetHtml = `
-                            <div class="bg-slate-900/80 border border-emerald-800/50 rounded-2xl p-5 shadow-xl backdrop-blur-sm animate-fade-in">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="font-semibold text-sm tracking-wide uppercase text-emerald-400">Document Créé</h3>
-                                    <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium">Drive</span>
-                                </div>
-                                <p class="text-sm text-slate-300 mb-4">Le document à propos de votre demande a été ajouté à votre cloud.</p>
-                                <a href="${docData.url}" target="_blank" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-emerald-600/10">
-                                    Ouvrir dans Google Docs
-                                </a>
-                            </div>
-                        `;
-                        grid.insertAdjacentHTML('beforeend', docWidgetHtml);
-                    }
-                } catch (error) {
-                    console.error("Erreur lors de la création du document :", error);
-                }
-            }
+            
+            // TODO: Envoyer la requête au backend et injecter le HTML reçu dans #dashboard-grid
         });
-
-        // Lancement de la vérification de session au chargement
-        window.onload = checkAuthStatus;
     </script>
 </body>
 </html>

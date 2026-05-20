@@ -5,3 +5,6 @@ client_secret.json
 venv/
 .venv/
 __pycache__/
+
+# Ignorer les fichiers archivés
+index.html.old
